@@ -1,0 +1,62 @@
+cmake_minimum_required (VERSION 3.0 FATAL_ERROR)
+#set(CMAKE_CXX_STANDARD 11)
+#set(CMAKE_CXX_STANDARD_REQUIRED ON)
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+#set(CMAKE_PREFIX_PATH "~/Qt/5.7/gcc_64/lib/cmake/Qt5")
+#set(CMAKE_PREFIX_PATH "/opt/")
+#set(CMAKE_INCLUDE_CURRENT_DIR ON)
+#set(CMAKE_AUTOMOC ON)
+project      (pcl-visualizer)
+#find_package (Qt4 REQUIRED)
+find_package (Qt5 REQUIRED COMPONENTS Widgets Core Gui)
+find_package (VTK 6 REQUIRED)
+find_package (PCL 1.7.1 REQUIRED)
+find_package(OpenCV REQUIRED)
+
+#find_package (Qt5Core)
+#find_package (Qt5Gui)
+#find_package (Qt5Widgets)
+#find_package (Qt5Multimedia REQUIRED)
+#find_package (Qt5)
+
+#added pcap lib
+include_directories (${PCL_INCLUDE_DIRS} "/use/include/pcap/")
+link_directories    (${PCL_LIBRARY_DIRS})
+add_definitions     (${PCL_DEFINITIONS})
+include_directories( ${OpenCV_INCLUDE_DIRS})
+
+set  (project_SOURCES main.cpp pclviewer.cpp lidarone.cpp lidartwo.cpp common.cpp recordpcapdata.cpp)
+set  (project_HEADERS pclviewer.h lidarone.h lidartwo.h recordpcapdata.h)
+set  (project_FORMS   pclviewer.ui)
+set  (VTK_LIBRARIES   vtkRendering vtkGraphics vtkHybrid QVTK)
+
+#include_directories (${Qt5Core_INCLUDE_DIRS})
+#include_directories ( ${Qt5Gui_INCLUDE_DIRS})
+#include_directories (${Qt5Widgets_INCLUDE_DIRS})
+#include_directories (${Qt5Multimedia_INCLUDE_DIRS})
+
+QT5_WRAP_CPP (project_HEADERS_MOC   ${project_HEADERS})
+QT5_WRAP_UI  (project_FORMS_HEADERS ${project_FORMS})
+
+
+#INCLUDE (${QT_USE_FILE})
+ADD_DEFINITIONS (${QT_DEFINITIONS})
+#add_definitions (${Qt5Core_DEFINITIONS})
+#add_definitions (${Qt5Gui_DEFINITIONS})
+#add_definitions (${Qt5Widgets_DEFINITIONS})
+#add_definitions (${Qt5Multimedia_DEFINITIONS})
+
+#set(QT_USE_QTMULTIMEDIA TRUE)
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${Qt5Multimedia_EXECUTABLE_COMPILE_FLAGS}")
+#set(CMAKE_CXX_FLAGS "-fPIC")
+
+include_directories(${OpenCV_INCLUDE_DIRS})
+ADD_EXECUTABLE  (pcl_visualizer ${project_SOURCES}
+                                ${project_FORMS_HEADERS}
+                                ${project_HEADERS_MOC})
+
+TARGET_LINK_LIBRARIES (pcl_visualizer ${QT_LIBRARIES} ${PCL_LIBRARIES} ${VTK_LIBRARIES} ${OpenCV_LIBS} "pcap")
+
+qt5_use_modules(pcl_visualizer Widgets Core Gui)
+#qt5_use_modules(pcl_visualizer Multimedia)
+
