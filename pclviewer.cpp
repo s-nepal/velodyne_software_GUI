@@ -389,8 +389,8 @@ void PCLViewer::on_actionLiveStream_triggered()
     form.addRow(&buttonBox);
     QObject::connect(&buttonBox, SIGNAL(accepted()), &getEthernetPorts, SLOT(accept()));
     QObject::connect(&buttonBox, SIGNAL(rejected()), &getEthernetPorts, SLOT(reject()));
-    portOne.setText("eth10");   //default port names
-    portTwo.setText("eth11");
+    portOne.setText("eth0");   //default port names
+    portTwo.setText("eth12");
     if(getEthernetPorts.exec() == QDialog::Accepted){
         mThread->portName = portOne.text();
         mThread2->portName = portTwo.text();
