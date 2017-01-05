@@ -1,0 +1,14 @@
+<RCC>
+    <qresource prefix="/">
+        <file>images/delete_red.png</file>
+        <file>images/WiresharkDoc.png</file>
+        <file>images/media-playback-pause.png</file>
+        <file>images/Lidar.jpg</file>
+        <file>images/media-playback-start.png</file>
+        <file>images/media-record.png</file>
+        <file>images/media-stopRecording.png</file>
+        <file>images/settings2.png</file>
+        <file>images/stopSymbol.png</file>
+        <file>images/csv.png</file>
+    </qresource>
+</RCC>

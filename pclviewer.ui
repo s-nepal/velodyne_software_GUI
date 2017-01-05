@@ -197,6 +197,9 @@
    </property>
   </action>
   <action name="actionStop">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset resource="images.qrc">
      <normaloff>:/images/stopSymbol.png</normaloff>:/images/stopSymbol.png</iconset>

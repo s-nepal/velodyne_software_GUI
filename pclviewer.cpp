@@ -25,19 +25,23 @@ PCLViewer::PCLViewer (QWidget *parent) :
     // Set up the QVTK window for visualizing point cloud data from Lidar_1
     viewer.reset (new pcl::visualization::PCLVisualizer ("viewer", false));
     ui->qvtkWidget->SetRenderWindow (viewer->getRenderWindow ());
-    viewer->setBackgroundColor(255,255,255);
+    viewer->setBackgroundColor(0, 0, 0);
     viewer->setCameraPosition(0,0,100,0,1,0);
     viewer->setupInteractor (ui->qvtkWidget->GetInteractor (), ui->qvtkWidget->GetRenderWindow ());
     viewer->addCoordinateSystem(10);
+    add_grid(viewer); // add grid to viewer
+
     ui->qvtkWidget->update ();
 
     //Set up the QVTK window for visualizing point cloud data from Lidar_2
     viewer2.reset(new pcl::visualization::PCLVisualizer ("viewer2", false));
     ui->qvtkWidget_2->SetRenderWindow (viewer2->getRenderWindow());
-    viewer2->setBackgroundColor(255,255,255);
+    viewer2->setBackgroundColor(0,0,0);
     viewer2->setCameraPosition(0,0,100,0,1,0);
     viewer2->setupInteractor (ui->qvtkWidget_2->GetInteractor(), ui->qvtkWidget_2->GetRenderWindow());
     viewer2->addCoordinateSystem(10);
+    add_grid(viewer2);
+
     ui->qvtkWidget_2->update();
 
     record =false;  //default value (disabling record at start of GUI)
@@ -63,6 +67,59 @@ PCLViewer::~PCLViewer ()
 {
     delete ui;
 }
+
+
+
+void PCLViewer::add_grid(boost::shared_ptr<pcl::visualization::PCLVisualizer> viewer)
+{
+    pcl::PointXYZRGBA point_1;
+    pcl::PointXYZRGBA point_2;
+
+    double grid_color[3] = {1, 1, 1};
+
+    // add x-axis grid marks
+    for(int i = -10; i < 11; i++){
+        point_1.x = -100;
+        point_1.y = i * 10;
+        point_1.z = 0;
+
+        point_2.x = 100;
+        point_2.y = i * 10;
+        point_2.z = 0;
+
+        // two points followed by normalized RGB values and the label
+        viewer->addLine<pcl::PointXYZRGBA> (point_1, point_2, grid_color[0], grid_color[1], grid_color[2], "line_x_" + std::to_string(i + 10));
+    }
+
+    // add y-axis grid marks
+    for(int i = -10; i < 11; i++){
+        point_1.y = -100;
+        point_1.x = i * 10;
+        point_1.z = 0;
+
+        point_2.y = 100;
+        point_2.x = i * 10;
+        point_2.z = 0;
+
+        viewer->addLine<pcl::PointXYZRGBA> (point_1, point_2, grid_color[0], grid_color[1], grid_color[2], "line_y_" + std::to_string(i + 10));
+    }
+
+    // add circular grid marks
+    pcl::ModelCoefficients circle_coeff;
+    circle_coeff.values.resize (3);    // We need 3 values
+
+    for(int i = 1; i < 11; i++){
+        circle_coeff.values[0] = 0;
+        circle_coeff.values[1] = 0;
+        circle_coeff.values[2] = i * 10;
+
+        viewer->addCircle(circle_coeff, "circle" + std::to_string(i + 10));
+    }
+
+}
+
+
+
 
 // ---------------------------------------------------------------------------
 //  void PCLViewer::onUpdate(int Number, pcl::PointCloud<pcl::PointXYZRGBA>::Ptr cloud)

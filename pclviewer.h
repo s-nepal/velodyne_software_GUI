@@ -2,6 +2,7 @@
 #define PCLVIEWER_H
 
 #include <iostream>
+#include <string>
 
 // Qt
 #include <QMainWindow>
@@ -75,6 +76,7 @@ private slots:
     void on_actionCsv_triggered();
     void onCsvFrameUpdate();
     void on_actionAbout_triggered();
+    void add_grid(boost::shared_ptr<pcl::visualization::PCLVisualizer> viewer);
 
 private:
    Ui::PCLViewer *ui;
