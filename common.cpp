@@ -128,15 +128,16 @@ void data_structure_builder_II(const struct pcap_pkthdr *pkthdr, const u_char *d
 // ---------------------------------------------------------------------------
 void colorize_point_cloud(double curr_intensity, pcl::PointXYZRGBA *sample)
 {
-    double intensity_range = 63; //any intensity value above 63 will be red
+    double intensity_range = 63; //any intensity value above this value will be red
     double wavelength;
+    double min_wavelength = 470; // used to discard overtly blue and purple points that are invisible due to the black background
 
-    if(curr_intensity <= 63)
-        wavelength = curr_intensity / intensity_range * (780-380) + 380;
+    if(curr_intensity <= intensity_range)
+        wavelength = curr_intensity / intensity_range * (780 - min_wavelength) + min_wavelength;
     else
         wavelength = 780;
 
-    if((wavelength >= 380) && (wavelength<440)){
+    if((wavelength >= 380) && (wavelength < 440)){
         sample->r = (-(wavelength - 440) / (440 - 380))*255;
         sample->g = 0;
         sample->b = 255;
@@ -161,7 +162,7 @@ void colorize_point_cloud(double curr_intensity, pcl::PointXYZRGBA *sample)
         sample->g = (-(wavelength - 645) / (645 - 580))*255;
         sample->b = 0;
 
-    }else if((wavelength >= 645) && (wavelength<781)){
+    }else if((wavelength >= 645) && (wavelength < 781)){
         sample->r = 255;
         sample->g = 0;
         sample->b = 0;
@@ -170,6 +171,8 @@ void colorize_point_cloud(double curr_intensity, pcl::PointXYZRGBA *sample)
         sample->g = 0;
         sample->b = 0;
     }
+
+    sample->a = 255;
 }
 
 

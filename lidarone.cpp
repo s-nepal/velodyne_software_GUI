@@ -115,8 +115,13 @@ PointCloudTPtr extract_xyz_I(struct data_packet& processed_packet, PointCloudTPt
             cloud -> points.push_back(sample);
         }
 
+        // This if conditional checks whether the shift from 360 deg to 0 deg has happened, signifying one full frame
         if(prev_azimuth_I > curr_azimuth && prev_azimuth_I <= 2*PI && curr_azimuth != 0){
-                    show_cloud_flag_I = 1;
+            if(prev_azimuth_I > 0.8*2*PI && curr_azimuth < 0.2*2*PI){
+                show_cloud_flag_I = 1;
+//                cout << "Previous azimuth: " << prev_azimuth_I / PI * 180 << endl;
+//                cout << "Current azimuth: " << curr_azimuth / PI * 180 << endl;
+            }
         }
 
         prev_azimuth_I = curr_azimuth;

@@ -75,7 +75,7 @@ void PCLViewer::add_grid(boost::shared_ptr<pcl::visualization::PCLVisualizer> vi
     pcl::PointXYZRGBA point_1;
     pcl::PointXYZRGBA point_2;
 
-    double grid_color[3] = {1, 1, 1};
+    double grid_color[3] = {1, 1, 1}; //RGB value
 
     // add x-axis grid marks
     for(int i = -10; i < 11; i++){
@@ -113,8 +113,10 @@ void PCLViewer::add_grid(boost::shared_ptr<pcl::visualization::PCLVisualizer> vi
         circle_coeff.values[1] = 0;
         circle_coeff.values[2] = i * 10;
 
-        viewer->addCircle(circle_coeff, "circle" + std::to_string(i + 10));
+        viewer->addCircle(circle_coeff, "circle_" + std::to_string(i + 10));
     }
+
+    //viewer->setPointCloudRenderingProperties (pcl::visualization::PCL_VISUALIZER_COLOR, 1.0, 0.0, 0.0, "circle_11");
 
 }
 
