@@ -73,13 +73,14 @@ void LidarTwo::run()
                 write_to_csv(cloud, curFrame, 1); // lidar id = 1 (3rd argument)
                 frameNumber--;
             }
-            cloud->points.clear();
+            cloud -> points.clear();
             global_ctr_II = 0;
             curFrame++;
         }
     }
+
     //clear PCL window
-    cloud->clear();
+    cloud -> clear();
     emit updateCloud(1, cloud);
 
     return;

@@ -48,13 +48,14 @@ void LidarOne::run()
     }
     struct get_packet *p = new struct get_packet;
     struct data_packet processed_packet;
-    PointCloudTPtr cloud (new PointCloudT);
+    static PointCloudTPtr cloud (new PointCloudT);
     while(!stop)
     {
         while(pause){
             if(stop)
                 break;
         }
+
         pcap_loop(descr, 1, packetHandler_I, (u_char *) p);
         if(!offline & enableBuffer)     //disable buffer untill it is enabled by user and in offline mode
             bufferBuilder(p->packet);
@@ -62,8 +63,8 @@ void LidarOne::run()
         cloud = extract_xyz_I(processed_packet, cloud);
 
         // emit the cloud to the screen only if cloud has one full 360 deg frame
-        if(show_cloud_flag_I == 1)
-        {
+        if(show_cloud_flag_I == 1){
+
             emit updateCloud(NumberUpdate, cloud);
             NumberUpdate++;
 
@@ -84,7 +85,7 @@ void LidarOne::run()
 
     }
     //to clear PCL window
-    cloud->clear();
+    cloud -> clear();
     emit updateCloud(1, cloud);
 
     return;
@@ -118,15 +119,13 @@ PointCloudTPtr extract_xyz_I(struct data_packet& processed_packet, PointCloudTPt
         // This if conditional checks whether the shift from 360 deg to 0 deg has happened, signifying one full frame
         if(prev_azimuth_I > curr_azimuth && prev_azimuth_I <= 2*PI && curr_azimuth != 0){
             if(prev_azimuth_I > 0.8*2*PI && curr_azimuth < 0.2*2*PI){
+                //cout << "Curr_Azimuth: " << curr_azimuth * 180 / PI << endl;
+                //cout << "Prev_Azimuth: " << prev_azimuth_I * 180 / PI << endl << endl;
                 show_cloud_flag_I = 1;
-//                cout << "Previous azimuth: " << prev_azimuth_I / PI * 180 << endl;
-//                cout << "Current azimuth: " << curr_azimuth / PI * 180 << endl;
             }
         }
-
-        prev_azimuth_I = curr_azimuth;
     }
-
+    prev_azimuth_I = curr_azimuth;
     return cloud;
 }
 
