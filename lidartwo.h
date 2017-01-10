@@ -9,7 +9,6 @@ const int delay_ms_II = 60; // delay (in ms) between two successive frames in of
 
 const int num_frame_buffer_II = 200; // number of 360 deg frames per buffer
 
-PointCloudTPtr extract_xyz_II(struct data_packet_II& processed_packet, PointCloudTPtr cloud);
 
 // ---------------------------------------------------------------------------
 //
@@ -34,6 +33,8 @@ signals:
     void updateCloud(int , pcl::PointCloud<pcl::PointXYZRGBA>::Ptr);
     void bufferEmptiedII();
 private:
+    void data_structure_builder(const struct pcap_pkthdr *pkthdr, const u_char *data, struct data_packet_II& processed_packet);
+    PointCloudTPtr extract_xyz(struct data_packet_II& processed_packet, PointCloudTPtr cloud);
     void bufferBuilder(const u_char *packet);
     QQueue<QString> bufferLidarTwo;
 };

@@ -53,11 +53,11 @@ void LidarTwo::run()
             if(stop)
                 break;
         }
-        pcap_loop(descr1, 1, packetHandler, (u_char *) p);
+        pcap_loop(descr1, 1, packetHandler_live, (u_char *) p);
         if(!offline & enableBuffer)
             bufferBuilder(p->packet);
-        data_structure_builder_II(p->pkthdr, p->packet, processed_packet);
-        cloud = extract_xyz_II(processed_packet, cloud);
+        data_structure_builder(p->pkthdr, p->packet, processed_packet);
+        cloud = extract_xyz(processed_packet, cloud);
 
         // if the cloud buffer is full
         if(global_ctr_II == cycle_num_II)
@@ -86,10 +86,53 @@ void LidarTwo::run()
     return;
 }
 
+
+// ---------------------------------------------------------------------------
+//  void data_structure_builder_II(const struct pcap_pkthdr *pkthdr, const u_char *data, struct data_packet_II& processed_packet)
+//
+//  Summary:
+//
+//  Parameters:
+// ---------------------------------------------------------------------------
+void LidarTwo::data_structure_builder(const struct pcap_pkthdr *pkthdr, const u_char *data, struct data_packet_II& processed_packet)
+{
+//       if (pkthdr->len != pkthdr->caplen)
+//           printf("Warning! Capture size different than packet size: %ld bytes\n", (long)pkthdr->len);
+        //cout << pkthdr->len << " : " << data[42] << " : " << data[43] << endl;
+
+       // // return an empty struct if the packet length is not 1498 bytes
+       if(pkthdr -> len != num_bytes_II){
+           processed_packet = (const struct data_packet_II){0};
+           return;
+       }
+
+       // if the payload does not start with 0xFFEE
+       if(data[42] != 0xFF || data[43] != 0xEE){
+           processed_packet = (const struct data_packet_II){0};
+           return;
+       }
+
+       // fill in the header
+       for(int i = 0; i < 42; i++){
+           processed_packet.header[i] = data[i]; // fill in the header
+       }
+
+       for(int i = 0; i < 4; i++){
+           processed_packet.footer[i] = data[i + 1494]; // fill in the footer
+       }
+
+       for(int i = 0; i < 1452; i++){
+           processed_packet.payload[i] = data[i + 42]; // fill in the payload
+       }
+
+       return;
+}
+
+
 // ---------------------------------------------------------------------------
 //
 // ---------------------------------------------------------------------------
-PointCloudTPtr extract_xyz_II(struct data_packet_II& processed_packet, PointCloudTPtr cloud)
+PointCloudTPtr LidarTwo::extract_xyz(struct data_packet_II& processed_packet, PointCloudTPtr cloud)
 {
     pcl::PointXYZRGBA sample;
 
