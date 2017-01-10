@@ -19,6 +19,7 @@ class LidarTwo : public QThread
 public:
     LidarTwo(QObject *parent = 0);
     void run();
+
     QString fileName;
     bool offline;
     bool pause;
@@ -28,6 +29,9 @@ public:
     bool stop;
     int curFrame;   //to track frame number
     int frameNumber;
+
+    pcap_t *descr;
+    int global_ctr_II;
 
 signals:
     void updateCloud(int , pcl::PointCloud<pcl::PointXYZRGBA>::Ptr);

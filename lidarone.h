@@ -33,6 +33,11 @@ public:
     int curFrame;   //keeps track of frame number
     int frameNumber;    //stores number of frames to store into a file
 
+    pcap_t *descr;
+
+    double prev_azimuth; // dummy value at the start
+    int show_cloud_flag; // this flag is set to 1 when the cloud buffer is filled with one full frame of data
+
 signals:
     void updateCloud(int , pcl::PointCloud<pcl::PointXYZRGBA>::Ptr);
     void bufferEmptied();

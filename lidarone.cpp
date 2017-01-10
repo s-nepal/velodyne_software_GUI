@@ -5,10 +5,6 @@
 #include <QDebug>
 #include <QByteArray>
 
-pcap_t *descr;
-double prev_azimuth_I = 999; // dummy value at the start
-int global_ctr_I = 0;		//to print out the packet number
-int show_cloud_flag_I = 0; // this flag is set to 1 when the cloud buffer is filled with one full frame of data
 
 // ---------------------------------------------------------------------------
 //  LidarOne Constructor
@@ -18,7 +14,10 @@ LidarOne::LidarOne(QObject *parent): QThread(parent)
     startBuffer = false;
     enableBuffer = false;
     stop = false;
-    curFrame = 0; frameNumber = 0;
+    curFrame = 0;
+    frameNumber = 0;
+    prev_azimuth = 999; // dummy value for now
+    show_cloud_flag = 0;
 }
 
 // ---------------------------------------------------------------------------
@@ -37,7 +36,7 @@ void LidarOne::run()
     if(offline){
         descr = pcap_open_offline(fileName.toStdString().c_str(), errbuf);
     }
-    else{
+    else {
 
         descr = pcap_open_live(portName.toStdString().c_str(), num_bytes_I, 1, 1, errbuf);
     }
@@ -46,6 +45,7 @@ void LidarOne::run()
       cout << "pcap_open_live() failed: " << errbuf << endl;
       return;
     }
+
     struct get_packet *p = new struct get_packet;
     struct data_packet processed_packet;
     static PointCloudTPtr cloud (new PointCloudT);
@@ -63,7 +63,7 @@ void LidarOne::run()
         cloud = extract_xyz(processed_packet, cloud);
 
         // emit the cloud to the screen only if cloud has one full 360 deg frame
-        if(show_cloud_flag_I == 1){
+        if(show_cloud_flag == 1){
 
             emit updateCloud(NumberUpdate, cloud);
             NumberUpdate++;
@@ -74,7 +74,7 @@ void LidarOne::run()
             else{
                 this->msleep(50);
             }
-            show_cloud_flag_I = 0;
+            show_cloud_flag = 0;
             if((frameNumber > 0) || (frameNumber < 0)){
                 write_to_csv(cloud, curFrame, 0); // lidar id = 0 (3rd argument)
                 frameNumber--;
@@ -175,15 +175,15 @@ PointCloudTPtr LidarOne::extract_xyz(struct data_packet& processed_packet, Point
         }
 
         // This if conditional checks whether the shift from 360 deg to 0 deg has happened, signifying one full frame
-        if(prev_azimuth_I > curr_azimuth && prev_azimuth_I <= 2*PI && curr_azimuth != 0){
-            if(prev_azimuth_I > 0.8*2*PI && curr_azimuth < 0.2*2*PI){
+        if(prev_azimuth > curr_azimuth && prev_azimuth <= 2*PI && curr_azimuth != 0){
+            if(prev_azimuth > 0.8*2*PI && curr_azimuth < 0.2*2*PI){
                 //cout << "Curr_Azimuth: " << curr_azimuth * 180 / PI << endl;
-                //cout << "Prev_Azimuth: " << prev_azimuth_I * 180 / PI << endl << endl;
-                show_cloud_flag_I = 1;
+                //cout << "Prev_Azimuth: " << prev_azimuth * 180 / PI << endl << endl;
+                show_cloud_flag = 1;
             }
         }
     }
-    prev_azimuth_I = curr_azimuth;
+    prev_azimuth = curr_azimuth;
     return cloud;
 }
 

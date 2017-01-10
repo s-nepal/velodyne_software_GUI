@@ -5,9 +5,6 @@
 #include <QDebug>
 #include<QByteArray>
 
-pcap_t *descr1;
-int global_ctr_II = 0;
-
 // ---------------------------------------------------------------------------
 //  LidarTwo constructor
 // ---------------------------------------------------------------------------
@@ -18,6 +15,7 @@ LidarTwo::LidarTwo(QObject *parent): QThread(parent)
     enableBuffer = false;
     stop = false;
     curFrame = 0; frameNumber = 0;
+    global_ctr_II = 0;
 }
 
 // ---------------------------------------------------------------------------
@@ -34,13 +32,13 @@ void LidarTwo::run()
     //code for pcap
     char errbuf[PCAP_ERRBUF_SIZE];
     if(offline){
-        descr1 = pcap_open_offline(fileName.toStdString().c_str(), errbuf);
+        descr = pcap_open_offline(fileName.toStdString().c_str(), errbuf);
     }
     else{
-        descr1 = pcap_open_live(portName.toStdString().c_str(), num_bytes_II, 1, 1, errbuf);
+        descr = pcap_open_live(portName.toStdString().c_str(), num_bytes_II, 1, 1, errbuf);
     }
 
-    if (descr1 == NULL) {
+    if (descr == NULL) {
       cout << "pcap_open_live() failed: " << errbuf << endl;
       return;
     }
@@ -53,7 +51,7 @@ void LidarTwo::run()
             if(stop)
                 break;
         }
-        pcap_loop(descr1, 1, packetHandler_live, (u_char *) p);
+        pcap_loop(descr, 1, packetHandler_live, (u_char *) p);
         if(!offline & enableBuffer)
             bufferBuilder(p->packet);
         data_structure_builder(p->pkthdr, p->packet, processed_packet);
