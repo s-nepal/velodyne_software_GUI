@@ -56,7 +56,7 @@ void LidarOne::run()
                 break;
         }
 
-        pcap_loop(descr, 1, packetHandler_I, (u_char *) p);
+        pcap_loop(descr, 1, packetHandler, (u_char *) p);
         if(!offline & enableBuffer)     //disable buffer untill it is enabled by user and in offline mode
             bufferBuilder(p->packet);
         data_structure_builder_I(p->pkthdr, p->packet, processed_packet);

@@ -12,7 +12,7 @@
 //      pkthdr      pointer to packet header extracted by pcap library.
 //      packet      poiter to packet data extracted by pcap library
 // ---------------------------------------------------------------------------
-void packetHandler_I(u_char *userData, const struct pcap_pkthdr* pkthdr, const u_char* packet)
+void packetHandler(u_char *userData, const struct pcap_pkthdr* pkthdr, const u_char* packet)
 {
     struct get_packet *p = (struct get_packet *) userData;
     p->pkthdr = pkthdr;

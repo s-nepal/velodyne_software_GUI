@@ -66,7 +66,7 @@ typedef pcl::PointXYZRGBA PointT;
 typedef pcl::PointCloud<PointT> PointCloudT;
 typedef pcl::PointCloud<pcl::PointXYZRGBA>::Ptr PointCloudTPtr;
 
-void packetHandler_I(u_char *userData, const struct pcap_pkthdr* pkthdr, const u_char* packet);
+void packetHandler(u_char *userData, const struct pcap_pkthdr* pkthdr, const u_char* packet);
 void data_structure_builder_I(const struct pcap_pkthdr *pkthdr, const u_char *data, struct data_packet& processed_packet);
 void data_structure_builder_II(const struct pcap_pkthdr *pkthdr, const u_char *data, struct data_packet_II& processed_packet);
 void colorize_point_cloud(double curr_intensity, pcl::PointXYZRGBA *sample);
