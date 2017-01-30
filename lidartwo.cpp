@@ -29,6 +29,8 @@ LidarTwo::LidarTwo(QObject *parent): QThread(parent)
 // ---------------------------------------------------------------------------
 void LidarTwo::run()
 {
+    cout << "Thread for LiDAR 2 Entered" << endl;
+
     //code for pcap
     char errbuf[PCAP_ERRBUF_SIZE];
     if(offline){
@@ -101,6 +103,7 @@ void LidarTwo::data_structure_builder(const struct pcap_pkthdr *pkthdr, const u_
        // // return an empty struct if the packet length is not 1498 bytes
        if(pkthdr -> len != num_bytes_II){
            processed_packet = (const struct data_packet_II){0};
+           cerr << "Packet size not equal to 1498 bytes" << endl;
            return;
        }
 
@@ -164,7 +167,7 @@ PointCloudTPtr LidarTwo::extract_xyz(struct data_packet_II& processed_packet, Po
     }
 
     global_ctr_II++;
-
+    //cout << "Extract xyz for LiDAR2 Entered" << endl;
     return cloud;
 }
 

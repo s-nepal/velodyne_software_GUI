@@ -44,9 +44,10 @@ void video::run()
 // ---------------------------------------------------------------------------
 void video::timerEvent(QTimerEvent *)
 {
+    //std::cout << "Video thread entered" << std::endl;
     cv::Mat *frame;
     frame = new cv::Mat;
-    camera >> *frame;
+    camera >> *frame; // camera is an OpenCV data type
 
     videoBuffer.enqueue(*frame);
     if(videoBuffer.size() > num_frame_buffer_video)
@@ -62,7 +63,7 @@ void video::timerEvent(QTimerEvent *)
     }
 
     if(record)      //if recording is enabled in live mode, write frame into a file
-        videoRecord->write(*frame);
+        videoRecord->write(*frame); // videoRecord is an OpenCV data type
 
     if(startBuffer){    //save the buffer into a file and emit signal after finished
         startBuffer = false;

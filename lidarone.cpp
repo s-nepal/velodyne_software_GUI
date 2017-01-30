@@ -31,6 +31,7 @@ LidarOne::LidarOne(QObject *parent): QThread(parent)
 // ---------------------------------------------------------------------------
 void LidarOne::run()
 {
+    cout << "Thread for LiDAR 1 Entered" << endl;
     //code for pcap
     char errbuf[PCAP_ERRBUF_SIZE];
     if(offline){
@@ -46,6 +47,7 @@ void LidarOne::run()
       return;
     }
 
+    // the struct get_packet has pkt_header and pkt_data
     struct get_packet *p = new struct get_packet;
     struct data_packet processed_packet;
     static PointCloudTPtr cloud (new PointCloudT);
@@ -108,6 +110,7 @@ void LidarOne::data_structure_builder(const struct pcap_pkthdr *pkthdr, const u_
 //     return an empty struct if the packet length is not 1248 bytes
     if(pkthdr -> len != num_bytes_I){
         processed_packet = (const struct data_packet){0};
+        cerr << "Packet size not equal to 1248 bytes" << endl;
         return;
     }
 

@@ -75,7 +75,7 @@ void PCLViewer::add_grid(boost::shared_ptr<pcl::visualization::PCLVisualizer> vi
     pcl::PointXYZRGBA point_1;
     pcl::PointXYZRGBA point_2;
 
-    double grid_color[3] = {1, 1, 1}; //RGB value
+    double grid_color[3] = {1, 1, 1}; //RGB value (currently white bcz. (1, 1, 1)
 
     // add x-axis grid marks
     for(int i = -10; i < 11; i++){
@@ -355,8 +355,9 @@ void PCLViewer::on_actionOpenCapturedFile_triggered()
        mThread2->fileName = filePath + "_Lidar_II.pcap";
     }
 
-    //start threads
-    mThread->start();
+    //start threads; mThread is a LidarOne object and mThread2 is a LidarTwo object
+    //This is the point where the two threads diverge
+    mThread->start(); // since LidarOne mThread inherits from QThread, it has access to the start() method which is originally defined in QThread
     mThread2->start();
 
     //camera
@@ -450,6 +451,7 @@ void PCLViewer::on_actionLiveStream_triggered()
     QObject::connect(&buttonBox, SIGNAL(rejected()), &getEthernetPorts, SLOT(reject()));
     portOne.setText("eth14");   //default port names
     portTwo.setText("eth12");
+
     if(getEthernetPorts.exec() == QDialog::Accepted){
         mThread->portName = portOne.text();
         mThread2->portName = portTwo.text();
@@ -460,7 +462,8 @@ void PCLViewer::on_actionLiveStream_triggered()
         return;
     }
 
-    //Camera
+    // Camera
+    // The camera thread will start only if a USB camera is connected to the PC
     ui->camWidget->setScaledContents(true);
     cvwidget = new video(this);
     cvwidget->camera.open(0);
@@ -478,9 +481,12 @@ void PCLViewer::on_actionLiveStream_triggered()
         cvwidget->start();  //start camera
     }
 
-    //start threads
-    mThread->start();
-    mThread2->start();
+    //start threads only if the port names are not blank
+    if(mThread -> portName != "")
+        mThread->start();
+
+    if(mThread2 -> portName != "")
+        mThread2->start();
 
     //update GUI
     ui->actionRecord->setEnabled(true);
@@ -517,7 +523,7 @@ void PCLViewer::on_actionRecord_triggered()
 
         //Instantiate two objects of RecordPcapData
         fromLidarOne = new RecordPcapData(num_bytes_I, this); //for velodyne lidar
-        fromLidarTwo = new RecordPcapData(num_bytes_II, this);
+        fromLidarTwo = new RecordPcapData(num_bytes_II, this); //for photonics lidar
         fromLidarOne->record = true;
         fromLidarTwo->record = true;
         fromLidarOne->fileName = timeStamp + "_Lidar_I.pcap";

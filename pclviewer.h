@@ -40,8 +40,8 @@ class PCLViewer : public QMainWindow
   Q_OBJECT
 
 public:
-    explicit PCLViewer (QWidget *parent = 0);
-    ~PCLViewer ();
+    explicit PCLViewer (QWidget *parent = 0); // constructor
+    ~PCLViewer ();  // destructor
     LidarOne *mThread;
     LidarTwo *mThread2;
     RecordPcapData *fromLidarOne;

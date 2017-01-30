@@ -31,6 +31,7 @@ void RecordPcapData::run()
         return;
     }
 
+    // use pcap_dump_open to create and open a .pcap file to store the data in
     if((pd = pcap_dump_open(descr, fileName.toStdString().c_str())) == NULL){
         qDebug() << "error in opening file" << fileName;
         return;
