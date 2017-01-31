@@ -16,6 +16,9 @@ LidarTwo::LidarTwo(QObject *parent): QThread(parent)
     stop = false;
     curFrame = 0; frameNumber = 0;
     global_ctr_II = 0;
+    prev_frame = 0;
+    curr_frame = 0;
+    frame_change = false;
 }
 
 // ---------------------------------------------------------------------------
@@ -57,11 +60,17 @@ void LidarTwo::run()
         if(!offline & enableBuffer)
             bufferBuilder(p->packet);
         data_structure_builder(p->pkthdr, p->packet, processed_packet);
-        cloud = extract_xyz(processed_packet, cloud);
+
+        if(!frame_change)
+            cloud = extract_xyz(processed_packet, cloud);
 
         // if the cloud buffer is full
-        if(global_ctr_II == cycle_num_II)
+        //if(global_ctr_II == cycle_num_II)
+
+        // if frame change has occurred, display the point cloud
+        if(frame_change)
         {
+            frame_change = false;
             emit updateCloud(1, cloud);
             if(offline){
                 this->msleep(delay_ms_II);
@@ -122,6 +131,14 @@ void LidarTwo::data_structure_builder(const struct pcap_pkthdr *pkthdr, const u_
            processed_packet.footer[i] = data[i + 1494]; // fill in the footer
        }
 
+       // set prev_frame number to curr_frame number and acquire a new curr_frame number
+       prev_frame = curr_frame;
+       curr_frame = (data[1494] << 24) | (data[1495] << 16) | (data[1496] << 8) | (data[1497]);
+
+       // if the frame number has changed, set the flag true for frame change
+       if(prev_frame != curr_frame)
+           frame_change = true;
+
        for(int i = 0; i < 1452; i++){
            processed_packet.payload[i] = data[i + 42]; // fill in the payload
        }
@@ -166,8 +183,7 @@ PointCloudTPtr LidarTwo::extract_xyz(struct data_packet_II& processed_packet, Po
         cloud -> points.push_back(sample);
     }
 
-    global_ctr_II++;
-    //cout << "Extract xyz for LiDAR2 Entered" << endl;
+    global_ctr_II++; // not used right now
     return cloud;
 }
 

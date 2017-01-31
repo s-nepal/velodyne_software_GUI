@@ -4,7 +4,7 @@
 #include "common.h"
 #include "savebuffer.h"
 
-const int cycle_num_II = 250; // number of UDP packets per 360 deg frame
+const int cycle_num_II = 66; // number of UDP packets per 360 deg frame; not used currently
 const int delay_ms_II = 60; // delay (in ms) between two successive frames in offline mode
 
 const int num_frame_buffer_II = 200; // number of 360 deg frames per buffer
@@ -41,6 +41,11 @@ private:
     PointCloudTPtr extract_xyz(struct data_packet_II& processed_packet, PointCloudTPtr cloud);
     void bufferBuilder(const u_char *packet);
     QQueue<QString> bufferLidarTwo;
+
+    // The following variables track changes in the global timestamp in detect a change in frame
+    uint32_t prev_frame;
+    uint32_t curr_frame;
+    bool frame_change;
 };
 
 #endif // PCAPTHREAD1_H
